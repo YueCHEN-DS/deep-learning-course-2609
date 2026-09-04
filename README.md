@@ -1,6 +1,14 @@
-# PyTorch Course Project: Handwritten Digit Recognition (MNIST)
+# Project 1: Handwritten Digit Recognition (MNIST)
+> **Deep Learning Course 2609 — Project 1**  
+> **Repository**: [https://github.com/YueCHEN-DS/deep-learning-course-2609](https://github.com/YueCHEN-DS/deep-learning-course-2609)  
+> **Live Demo**: [http://localhost:8791](http://localhost:8791)
 
-A complete, self-contained machine learning course project implementing, training, and evaluating a Convolutional Neural Network (CNN) on the MNIST dataset using **PyTorch** with Apple Silicon GPU (`mps`) acceleration.
+A complete machine learning course project comparing three distinct model architectures on the MNIST dataset:
+1. **Classical Linear ML**: Scikit-Learn Multinomial Logistic Regression (**92.59%** Acc)
+2. **Deep Feed-Forward Network**: PyTorch Multi-Layer Perceptron (MLP) (**97.68%** Acc)
+3. **Spatial Deep Learning**: PyTorch 2-Stage Convolutional Neural Network (CNN) (**99.11%** Acc)
+
+Includes client-side browser deployment with live multi-model inference and side-by-side comparison on port 8791.
 
 ---
 

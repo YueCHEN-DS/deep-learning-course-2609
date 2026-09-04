@@ -1,4 +1,5 @@
-# Course Presentation Guide: The 3-Tier MNIST Machine Learning Trilogy
+# Project 1 Presentation Guide: The 3-Tier MNIST Machine Learning Trilogy
+> **Deep Learning Course 2609 — Project 1**  
 ## Classical ML (Logistic Regression) vs. Deep Feed-Forward (MLP) vs. Spatial Deep Learning (CNN)
 
 This document provides a comprehensive, presentation-ready comparison of **all three models** implemented in this course project.
