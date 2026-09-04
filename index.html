@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Handwritten Digit Recognition - Course Project (CNN vs MLP vs Classical ML)</title>
+  <meta name="description" content="Client-side handwritten digit recognition comparing Deep CNN, Multi-Layer Perceptron (MLP), and Classical Machine Learning (Logistic Regression).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">Handwritten Digit Recognition</h1>
+      <p class="app-subtitle">Draw one large digit (0–9) in white, then click Predict.</p>
+      
+      <!-- Model Selector Segmented Control (3 Models + Compare All) -->
+      <div class="model-selector-bar">
+        <div class="selector-label">Model Architecture:</div>
+        <div class="selector-pills" role="tablist">
+          <button id="tab-cnn" class="pill-btn active" type="button" data-model="cnn">
+            <span class="pill-icon">🧠</span>
+            <span class="pill-text">PyTorch CNN</span>
+            <span class="pill-badge">99.11%</span>
+          </button>
+          <button id="tab-mlp" class="pill-btn" type="button" data-model="mlp">
+            <span class="pill-icon">⚡</span>
+            <span class="pill-text">PyTorch MLP</span>
+            <span class="pill-badge">97.68%</span>
+          </button>
+          <button id="tab-sklearn" class="pill-btn" type="button" data-model="sklearn">
+            <span class="pill-icon">📊</span>
+            <span class="pill-text">Scikit-Learn ML</span>
+            <span class="pill-badge">92.59%</span>
+          </button>
+          <button id="tab-compare" class="pill-btn" type="button" data-model="compare">
+            <span class="pill-icon">⚖️</span>
+            <span class="pill-text">Compare All 3</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-layout">
+      <!-- Left Column: Drawing Area & Action Controls -->
+      <section class="drawing-section">
+        <div class="canvas-wrapper">
+          <canvas id="drawing-canvas" width="280" height="280"></canvas>
+          <div class="canvas-hint" id="canvas-hint">Draw here</div>
+        </div>
+        <div class="button-row">
+          <button id="clear-btn" class="btn btn-secondary" type="button">Clear</button>
+          <button id="predict-btn" class="btn btn-primary" type="button">Predict</button>
+        </div>
+      </section>
+
+      <!-- Right Column: Prediction & Details -->
+      <section class="result-section">
+        <!-- Single Model Result View -->
+        <div class="prediction-card" id="single-pred-card">
+          <div class="pred-card-header">
+            <h2 class="section-title">Prediction</h2>
+            <span class="model-tag" id="active-model-tag">PyTorch CNN</span>
+          </div>
+          <div class="prediction-display" id="prediction-value">?</div>
+          <div class="confidence-display" id="confidence-value">Confidence: <span>—</span></div>
+        </div>
+
+        <!-- Comparison Mode: 3-Card Side-by-Side View -->
+        <div class="comparison-cards hidden" id="comparison-cards">
+          <div class="compare-card cnn-card">
+            <div class="compare-badge">🧠 CNN</div>
+            <div class="compare-name">ConvNet (99.1%)</div>
+            <div class="compare-digit" id="compare-cnn-digit">?</div>
+            <div class="compare-conf" id="compare-cnn-conf">Conf: —</div>
+          </div>
+          <div class="compare-card mlp-card">
+            <div class="compare-badge">⚡ MLP</div>
+            <div class="compare-name">Dense (97.7%)</div>
+            <div class="compare-digit" id="compare-mlp-digit">?</div>
+            <div class="compare-conf" id="compare-mlp-conf">Conf: —</div>
+          </div>
+          <div class="compare-card sklearn-card">
+            <div class="compare-badge">📊 Linear ML</div>
+            <div class="compare-name">Logistic (92.6%)</div>
+            <div class="compare-digit" id="compare-sklearn-digit">?</div>
+            <div class="compare-conf" id="compare-sklearn-conf">Conf: —</div>
+          </div>
+        </div>
+
+        <!-- AI Vision Inspector: Centered 28x28 Preprocessed Input & Class Distribution -->
+        <div class="inspector-card">
+          <div class="inspector-header">
+            <h3>AI Input Preview (28×28)</h3>
+            <span class="badge">MNIST Centered</span>
+          </div>
+          <div class="inspector-body">
+            <div class="preview-box">
+              <canvas id="preview-canvas" width="28" height="28"></canvas>
+            </div>
+            <div class="probabilities-container">
+              <div class="probabilities-title" id="prob-title">Digit Probabilities (0–9)</div>
+              <div class="prob-bars" id="prob-bars">
+                <!-- Generated dynamically by app.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p id="footer-desc">Currently running: <strong>PyTorch CNN</strong> (99.11% accuracy, ~97k parameters). Switch above to test <strong>PyTorch MLP</strong> or <strong>Scikit-Learn Logistic Regression</strong>!</p>
+    </footer>
+  </div>
+
+  <!-- Model Weights for all 3 Architectures -->
+  <script src="weights.js"></script>
+  <script src="mlp_weights.js"></script>
+  <script src="sklearn_weights.js"></script>
+  <!-- Application & Inference Engine -->
+  <script src="app.js"></script>
+</body>
+</html>
