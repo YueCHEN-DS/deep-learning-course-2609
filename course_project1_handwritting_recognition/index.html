@@ -13,8 +13,15 @@
 <body>
   <div class="app-container">
     <header class="app-header">
-      <h1 class="app-title">Handwritten Digit Recognition</h1>
-      <p class="app-subtitle">Draw one large digit (0–9) in white, then click Predict.</p>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+        <div>
+          <h1 class="app-title">Handwritten Digit Recognition</h1>
+          <p class="app-subtitle">Draw one large digit (0–9) in white, then click Predict.</p>
+        </div>
+        <a href="presentation.html" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #1e293b; border: 1px solid #475569; color: #f1f5f9; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease;">
+          <span>📊 Architecture & Training Report</span>
+        </a>
+      </div>
       
       <!-- Model Selector Segmented Control (3 Models + Compare All) -->
       <div class="model-selector-bar">

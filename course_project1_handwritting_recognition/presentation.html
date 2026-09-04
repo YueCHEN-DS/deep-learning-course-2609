@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project 1: Logistic Regression vs. MLP Architecture & Performance Study</title>
+  <meta name="description" content="Comparative architecture and empirical performance study focusing on Multinomial Logistic Regression and Multi-Layer Perceptron for MNIST digit recognition.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --bg-body: #0a0e17;
+      --bg-surface: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card-alt: #1e293b;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-accent: rgba(99, 102, 241, 0.3);
+
+      --text-main: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+
+      --accent-linear: #059669;
+      --accent-linear-glow: rgba(5, 150, 105, 0.25);
+
+      --accent-mlp: #8b5cf6;
+      --accent-mlp-glow: rgba(139, 92, 246, 0.25);
+
+      --accent-cnn: #3b82f6;
+      --accent-cyan: #06b6d4;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 40px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    /* Header & Navigation */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 36px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .badge-course {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .live-demo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .live-demo-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+
+    .hero {
+      margin-bottom: 48px;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 820px;
+    }
+
+    /* Key Stats Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .stat-card.linear::before { background: var(--accent-linear); }
+    .stat-card.mlp::before { background: var(--accent-mlp); }
+    .stat-card.cnn::before { background: var(--accent-cnn); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .stat-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Infographic Banner */
+    .infographic-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 56px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .banner-img-container {
+      width: 100%;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background: #000000;
+    }
+
+    .banner-img-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Two Main Model Sections */
+    .model-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 48px;
+      position: relative;
+    }
+
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .model-tag-large {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .model-tag-large.linear {
+      background: var(--accent-linear-glow);
+      color: #34d399;
+      border: 1px solid rgba(5, 150, 105, 0.4);
+    }
+
+    .model-tag-large.mlp {
+      background: var(--accent-mlp-glow);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    .model-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .model-grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin: 16px 0 24px 0;
+    }
+
+    .spec-table th, .spec-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .spec-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .spec-table td {
+      color: var(--text-main);
+    }
+
+    .spec-table td.code {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #60a5fa;
+    }
+
+    .code-snippet-box {
+      background: #0f141f;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-keyword { color: #f43f5e; font-weight: 600; }
+    .code-func { color: #38bdf8; }
+    .code-number { color: #fbbf24; }
+
+    .plot-container {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .plot-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .plot-caption {
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .analysis-callout {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #6366f1;
+      padding: 14px 18px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .analysis-callout strong {
+      color: var(--text-main);
+    }
+
+    /* Comparison Head to Head */
+    .comparison-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+
+    .head-to-head-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      font-size: 0.9rem;
+    }
+
+    .head-to-head-table th, .head-to-head-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .head-to-head-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.825rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .head-to-head-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .winner-val {
+      font-weight: 700;
+      color: #34d399;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Navigation & Badge -->
+    <nav class="nav-bar">
+      <div class="badge-course">
+        <span>🎓</span> Deep Learning Course 2609 — Project 1
+      </div>
+      <a href="http://localhost:8791" target="_blank" class="live-demo-link">
+        <span>⚡ Launch Live Web App (Port 8791)</span>
+      </a>
+    </nav>
+
+    <!-- Hero Title -->
+    <header class="hero">
+      <h1>Model Architecture & Empirical Analysis</h1>
+      <p>A comprehensive study comparing <strong>Multinomial Logistic Regression</strong> (Classical Linear Machine Learning) against <strong>Multi-Layer Perceptron</strong> (Deep Feed-Forward Network) on the MNIST handwritten digit benchmark.</p>
+    </header>
+
+    <!-- Key Performance Summary Grid -->
+    <section class="stats-grid">
+      <div class="stat-card linear">
+        <div class="stat-label">Model 1 • Scikit-Learn</div>
+        <div class="stat-value">92.59%</div>
+        <div class="stat-desc">Multinomial Logistic Regression (7,850 params)</div>
+      </div>
+      <div class="stat-card mlp">
+        <div class="stat-label">Model 2 • PyTorch MLP</div>
+        <div class="stat-value">97.68%</div>
+        <div class="stat-desc">Deep Feed-Forward Network (218,058 params)</div>
+      </div>
+      <div class="stat-card cnn">
+        <div class="stat-label">Model 3 • PyTorch CNN</div>
+        <div class="stat-value">99.11%</div>
+        <div class="stat-desc">2-Stage Convolutional Network (97,706 params)</div>
+      </div>
+    </section>
+
+    <!-- Visual Architecture Infographic -->
+    <section class="infographic-card">
+      <h2 class="card-title">
+        <span>📐</span> Architectural Evolution Infographic
+      </h2>
+      <p class="card-subtitle">Visual diagram illustrating data flow, tensor dimensionality, and connection topologies across all three paradigms.</p>
+      <div class="banner-img-container">
+        <img src="plots/architectures_comparison.png" alt="Comparison of Machine Learning Architectures for Handwritten Digit Recognition">
+      </div>
+    </section>
+
+    <!-- =================================================== -->
+    <!-- MODEL 1: SCIKIT-LEARN LOGISTIC REGRESSION -->
+    <!-- =================================================== -->
+    <article class="model-section" id="model-logistic">
+      <div class="model-header">
+        <div>
+          <h2 class="card-title">Model 1: Multinomial Logistic Regression</h2>
+          <p class="card-subtitle">Classical Linear Classification via L-BFGS Convex Optimization</p>
+        </div>
+        <span class="model-tag-large linear">Classical ML • 92.59% Test Accuracy</span>
+      </div>
+
+      <div class="model-grid-layout">
+        <!-- Left Column: Specs, Math, Code -->
+        <div>
+          <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Mathematical Formulation</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px;">
+            The model computes a direct linear dot product between all 784 flattened pixels and 10 class weight vectors, followed by a Softmax normalization:
+          </p>
+
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Dimension</th>
+                <th>Parameters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Input Vector ($x$)</td>
+                <td class="code">1 × 784</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>Weight Matrix ($W$)</td>
+                <td class="code">10 × 784</td>
+                <td>7,840</td>
+              </tr>
+              <tr>
+                <td>Bias Vector ($b$)</td>
+                <td class="code">10</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td><strong>Total Parameters</strong></td>
+                <td class="code"><strong>7,850 weights</strong></td>
+                <td><strong>~42 KB Payload</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="font-size: 1.05rem; margin-top: 20px; margin-bottom: 8px;">Scikit-Learn Implementation (<code style="color: #38bdf8;">train_sklearn.py</code>)</h3>
+          <div class="code-snippet-box">
+<span class="code-keyword">from</span> sklearn.linear_model <span class="code-keyword">import</span> LogisticRegression
+
+clf = <span class="code-func">LogisticRegression</span>(
+    solver=<span class="code-number">"lbfgs"</span>,
+    max_iter=<span class="code-number">250</span>,
+    C=<span class="code-number">1.0</span>,
+    random_state=<span class="code-number">42</span>
+)
+clf.<span class="code-func">fit</span>(X_train, y_train) <span class="code-comment"># Trains in 6.26 seconds!</span>
+          </div>
+
+          <div class="analysis-callout">
+            <strong>Key Insight for Presentation:</strong>
+            Because Logistic Regression has zero hidden layers, its decision boundary is strictly planar. It cannot model complex stroke interactions (e.g. crossing strokes or closed loops), which causes its accuracy to plateau at ~92.6%.
+          </div>
+        </div>
+
+        <!-- Right Column: Confusion Matrix Plot & Diagnostics -->
+        <div>
+          <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Evaluation Confusion Matrix (10,000 Test Set)</h3>
+          <div class="plot-container">
+            <img src="plots/sklearn_confusion_matrix.png" alt="Confusion Matrix for Scikit-Learn Logistic Regression">
+            <div class="plot-caption">
+              Annotated $10 \times 10$ confusion matrix showing test counts per digit. Notice higher misclassification on visually similar pairs: <strong>5 vs 8</strong> (41 errors) and <strong>4 vs 9</strong> (27 errors).
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- =================================================== -->
+    <!-- MODEL 2: PYTORCH MULTI-LAYER PERCEPTRON (MLP) -->
+    <!-- =================================================== -->
+    <article class="model-section" id="model-mlp">
+      <div class="model-header">
+        <div>
+          <h2 class="card-title">Model 2: PyTorch Multi-Layer Perceptron (MLP)</h2>
+          <p class="card-subtitle">Deep Non-Linear Feed-Forward Network with ReLU & Dropout Regularization</p>
+        </div>
+        <span class="model-tag-large mlp">Deep Learning • 97.68% Test Accuracy</span>
+      </div>
+
+      <div class="model-grid-layout">
+        <!-- Left Column: Specs, Math, Code -->
+        <div>
+          <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Layer-by-Layer Architectural Architecture</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px;">
+            The MLP introduces two hidden dense layers with non-linear activations ($\text{ReLU}(z) = \max(0, z)$) and $20\%$ dropout to learn hierarchical combinations of pixel values:
+          </p>
+
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Operation</th>
+                <th>Output Dim</th>
+                <th>Parameters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Input</td>
+                <td>Flatten</td>
+                <td class="code">784</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>Hidden 1 (<code style="color: #a78bfa;">fc1</code>)</td>
+                <td>Linear + ReLU + Dropout(0.2)</td>
+                <td class="code">256</td>
+                <td>$784 \times 256 + 256 = \mathbf{200,960}$</td>
+              </tr>
+              <tr>
+                <td>Hidden 2 (<code style="color: #a78bfa;">fc2</code>)</td>
+                <td>Linear + ReLU + Dropout(0.2)</td>
+                <td class="code">64</td>
+                <td>$256 \times 64 + 64 = \mathbf{16,448}$</td>
+              </tr>
+              <tr>
+                <td>Output (<code style="color: #a78bfa;">fc3</code>)</td>
+                <td>Linear + Softmax</td>
+                <td class="code">10</td>
+                <td>$64 \times 10 + 10 = \mathbf{650}$</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td colspan="2"><strong>3-Layer Deep MLP</strong></td>
+                <td><strong>218,058 parameters (~880 KB)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="font-size: 1.05rem; margin-top: 20px; margin-bottom: 8px;">PyTorch Module Definition (<code style="color: #38bdf8;">train_mlp.py</code>)</h3>
+          <div class="code-snippet-box">
+<span class="code-keyword">class</span> <span class="code-func">DigitMLP</span>(nn.Module):
+    <span class="code-keyword">def</span> <span class="code-func">__init__</span>(self):
+        super().__init__()
+        self.fc1 = nn.<span class="code-func">Linear</span>(<span class="code-number">784</span>, <span class="code-number">256</span>)
+        self.fc2 = nn.<span class="code-func">Linear</span>(<span class="code-number">256</span>, <span class="code-number">64</span>)
+        self.fc3 = nn.<span class="code-func">Linear</span>(<span class="code-number">64</span>, <span class="code-number">10</span>)
+        self.relu = nn.<span class="code-func">ReLU</span>()
+        self.dropout = nn.<span class="code-func">Dropout</span>(<span class="code-number">0.2</span>)
+          </div>
+
+          <div class="analysis-callout">
+            <strong>Key Insight for Presentation:</strong>
+            By adding two hidden layers with non-linear activation functions, the MLP jumps from 92.59% to <strong>97.68% accuracy (+5.09 percentage points)</strong>. However, because it is fully connected, the first layer alone requires 200k parameters.
+          </div>
+        </div>
+
+        <!-- Right Column: Training Curves & Confusion Matrix -->
+        <div>
+          <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Training Curves (Loss & Accuracy vs. Epoch)</h3>
+          <div class="plot-container">
+            <img src="plots/mlp_training_curves.png" alt="Training & Validation Curves for PyTorch MLP">
+            <div class="plot-caption">
+              Epoch-by-epoch convergence on Apple Silicon GPU (<code style="color: #38bdf8;">mps</code>). Loss steadily declines from 0.66 to 0.075 as test accuracy climbs to 97.68%.
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.05rem; margin-top: 18px; margin-bottom: 8px;">MLP Confusion Matrix</h3>
+          <div class="plot-container">
+            <img src="plots/mlp_confusion_matrix.png" alt="Confusion Matrix for PyTorch MLP">
+            <div class="plot-caption">
+              Confusion matrix for the MLP. Notice significantly darker diagonals compared to Logistic Regression, confirming a reduction in misclassified cases.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- =================================================== -->
+    <!-- COMPARISON & SUMMARY TABLE -->
+    <!-- =================================================== -->
+    <section class="comparison-section">
+      <h2 class="card-title">Head-to-Head Architectural Comparison</h2>
+      <p class="card-subtitle">Detailed side-by-side metric matrix contrasting Logistic Regression, MLP, and the CNN benchmark.</p>
+
+      <table class="head-to-head-table">
+        <thead>
+          <tr>
+            <th>Metric / Dimension</th>
+            <th>📊 Logistic Regression (Linear)</th>
+            <th>⚡ Multi-Layer Perceptron (MLP)</th>
+            <th>🧠 Convolutional Neural Net (CNN)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Framework</strong></td>
+            <td>Scikit-Learn (1.8.0)</td>
+            <td>PyTorch (2.9.1)</td>
+            <td>PyTorch (2.9.1)</td>
+          </tr>
+          <tr>
+            <td><strong>Model Category</strong></td>
+            <td>Generalized Linear Model (GLM)</td>
+            <td>Deep Feed-Forward Network</td>
+            <td>Deep 2D Convolutional Network</td>
+          </tr>
+          <tr>
+            <td><strong>Input Representation</strong></td>
+            <td>Flattened 1D vector (784)</td>
+            <td>Flattened 1D vector (784)</td>
+            <td>2D image tensor ($1 \times 28 \times 28$)</td>
+          </tr>
+          <tr>
+            <td><strong>Hidden Layers</strong></td>
+            <td>0</td>
+            <td>2 dense layers ($256 \to 64$)</td>
+            <td>2 Conv stages ($16 \to 32$) + 2 dense</td>
+          </tr>
+          <tr>
+            <td><strong>Total Parameters</strong></td>
+            <td class="winner-val"><strong>7,850</strong> (Ultra-compact)</td>
+            <td>218,058 (Dense matrix)</td>
+            <td>97,706 (Weight sharing)</td>
+          </tr>
+          <tr>
+            <td><strong>Model Payload Size</strong></td>
+            <td class="winner-val"><strong>~42 KB</strong></td>
+            <td>~880 KB</td>
+            <td>~830 KB</td>
+          </tr>
+          <tr>
+            <td><strong>Test Accuracy</strong></td>
+            <td>92.59%</td>
+            <td>97.68% (+5.09 pp)</td>
+            <td class="winner-val"><strong>99.11% (+6.52 pp)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Macro F1-Score</strong></td>
+            <td>0.9248</td>
+            <td>0.9767</td>
+            <td class="winner-val"><strong>0.9911</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Inference Time (JS)</strong></td>
+            <td class="winner-val"><strong>~0.1 ms</strong></td>
+            <td>~0.4 ms</td>
+            <td>~7 ms</td>
+          </tr>
+          <tr>
+            <td><strong>Spatial Awareness</strong></td>
+            <td>None (Position blind)</td>
+            <td>Low (Prone to shift errors)</td>
+            <td class="winner-val"><strong>High (Translation invariant)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Course Project 1: Handwritten Digit Recognition • Deep Learning Course 2609</p>
+      <p style="margin-top: 4px; color: var(--text-muted);">Interactive Multi-Model Demo accessible at <a href="http://localhost:8791" style="color: #818cf8; text-decoration: none;">http://localhost:8791</a></p>
+    </footer>
+  </div>
+</body>
+</html>
