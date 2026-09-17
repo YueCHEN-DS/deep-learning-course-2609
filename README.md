@@ -19,7 +19,7 @@ Documentation:
 
 ---
 
-### [📁 Project 2: Hotel Review Aspect-Based Sentiment Analysis (`Hotel_Review_MLP_Project_Materials_iba2`)](./Hotel_Review_MLP_Project_Materials_iba2/)
+### [📁 Project 2: Hotel Review Aspect-Based Sentiment Analysis (`course_project2_hotel_review_sentiment_analysis`)](./course_project2_hotel_review_sentiment_analysis/)
 A fine-grained, multi-task NLP sentiment analysis system classifying Chinese hotel reviews across **8 aspects × 5 sentiment states** (40-output logits):
 - **Core Architecture**: Deep PyTorch MLP (`256 → 384 → 192 → 40`) trained on 256-dimensional Qwen text embeddings.
 - **4-Generation Evolution Benchmark**:
@@ -34,6 +34,7 @@ A fine-grained, multi-task NLP sentiment analysis system classifying Chinese hot
   - **Training Dataset Studio**: 2,000-sample visualizer, model disagreement filter, in-browser ground truth editor, and 1-click hot retraining workflow.
 
 Documentation:
-- [Project 2 README](./Hotel_Review_MLP_Project_Materials_iba2/README.md)
-- [Annotation Notes & Multi-Agent Audit](./Hotel_Review_MLP_Project_Materials_iba2/labels_final_2000_v4_mlp_notes.md)
-- [MLP Optimization & Ablation Report](./Hotel_Review_MLP_Project_Materials_iba2/experiments/mlp_optimization_analysis.md)
+- [Project 2 README](./course_project2_hotel_review_sentiment_analysis/README.md)
+- [Presentation Guide & Defense Prep](./course_project2_hotel_review_sentiment_analysis/PRESENTATION_GUIDE.md)
+- [Annotation Notes & Multi-Agent Audit](./course_project2_hotel_review_sentiment_analysis/labels_final_2000_v4_mlp_notes.md)
+- [MLP Optimization & Ablation Report](./course_project2_hotel_review_sentiment_analysis/experiments/mlp_optimization_analysis.md)
