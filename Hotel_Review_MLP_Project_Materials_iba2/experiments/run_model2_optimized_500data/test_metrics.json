@@ -1,0 +1,1032 @@
+{
+  "experiment": "run_model2_optimized_500data",
+  "parameters": 43752,
+  "args": {
+    "data_dir": "/Users/cy/Desktop/dp/ddp/Hotel_Review_MLP_Project_Materials_iba2",
+    "labels_file": "labels_ai_suggestions.jsonl",
+    "allow_unreviewed": false,
+    "skip_needs_review": false,
+    "hidden_dims": [
+      128,
+      64
+    ],
+    "dropout": 0.25,
+    "batch_norm": false,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 32,
+    "epochs": 60,
+    "early_stopping_patience": 15,
+    "loss_weighting": "balanced",
+    "class_0_weight": 0.25,
+    "damping_factor": 0.5,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "exp_name": "run_model2_optimized_500data"
+  },
+  "test_metrics": {
+    "loss": 0.6839404106140137,
+    "overall_accuracy": 0.7634615384615384,
+    "mention_precision": 0.5470588235294118,
+    "mention_recall": 0.7322834645669292,
+    "mention_f1": 0.6262626262626263,
+    "macro_f1": 0.39380743628430104,
+    "micro_f1": 0.7634615384615384,
+    "non_absent_macro_f1": 0.27960788216560506,
+    "per_aspect_acc": {
+      "cleanliness": 0.8,
+      "service": 0.7538461538461538,
+      "location": 0.7846153846153846,
+      "facilities": 0.6461538461538462,
+      "room_comfort": 0.7384615384615385,
+      "sound_insulation_noise": 0.9076923076923077,
+      "food": 0.8153846153846154,
+      "value": 0.6615384615384615
+    },
+    "per_aspect_mention_f1": {
+      "cleanliness": 0.43478260869565216,
+      "service": 0.7878787878787877,
+      "location": 0.5714285714285714,
+      "facilities": 0.6206896551724138,
+      "room_comfort": 0.5789473684210527,
+      "sound_insulation_noise": 0.5454545454545454,
+      "food": 0.5454545454545454,
+      "value": 0.6274509803921569
+    }
+  },
+  "top_error_cases": [
+    {
+      "sentence_id": "HTL_S0397",
+      "sentence": "开发区里首屈一指的酒店，设施、服务都不错。",
+      "num_errors": 5,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0177",
+      "sentence": "地段不错，性价比不高，向阳的房间外面有装饰大灯，换了房间背阳感觉上有一股发霉的味道，结帐的时间较长。",
+      "num_errors": 5,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "service",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "location",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "value",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0037",
+      "sentence": "房间不错，环境好，早餐不错，就是比较吵！",
+      "num_errors": 5,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "food",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0040",
+      "sentence": "设施很不错；周边环境不错，紧邻金沙滩；推荐海景房不足：比较偏；吃饭不放便；酒店自带的餐厅性价比太差。",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "4 (mixed)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "food",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "1 (negative)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0231",
+      "sentence": "晚上没完没了的骚扰电话，让人真的不敢恭维补充点评2007年12月14日：我打的都是1分，怎么平均出来是2分？",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0391",
+      "sentence": "这家酒店太让我失望了,房间小的简直不能再小了而且服务态度一般除了天台泳池还可以以外,还不如住海景酒店离天后车站又近价钱又便宜,下次去香港我肯定不住这家",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "2 (neutral)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0380",
+      "sentence": "所以你要准备好拖鞋不能在住店期间搞湿弄脏,这意味着收费!",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "value",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0317",
+      "sentence": "非常的好,服务很热情,房间很新很干净,交通也算方便",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0259",
+      "sentence": "房间还不错，挺大的，早餐一般。",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "2 (neutral)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0388",
+      "sentence": "住的行政大床房,虽然在义乌这个房价有点高,但我觉得值得推荐,服务都不错的",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "value",
+          "expected": "4 (mixed)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0171",
+      "sentence": "目前是新昌最好的酒店，环境和服务质量都非常好，国内长度免费和免费宽带还是蛮有吸引力的，离大佛寺仅咫尺之遥，太方便了补充点评2008年5月4日：酒店一楼中餐厅内的白斩鸡和水库剁椒鱼头是不能不尝的？",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0487",
+      "sentence": "不错的酒店,装修和风格都很好,是郑州最好的酒店了.",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0099",
+      "sentence": "正赶上游泳池清理换水，不过泳池周围很漂亮，玻璃屋顶，很温暖，像到了亚热带，照了几张相。",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "4 (mixed)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0234",
+      "sentence": "还有，早餐稍晚点，就没什么可吃的了，做的也很一般",
+      "num_errors": 4,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "food",
+          "expected": "2 (neutral)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0012",
+      "sentence": "入住时酒店的服务很好，大堂和房间一般，入住后发现房间的硬件较差，比如空调，马桶，尤其是电视遥控器非常差，几乎不能用。",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "service",
+          "expected": "3 (positive)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "2 (neutral)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0431",
+      "sentence": "电视、地毯、大床等等我的客人见了都感觉很好",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0248",
+      "sentence": "无线的键盘，坐在房上可以用电脑，第一次看见这样的酒店电视。",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0108",
+      "sentence": "定的是特惠的大床房，给免费升级了，升到啥不记得了，反正挺好的。",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0048",
+      "sentence": "早餐30,不能退,也不能期,太理.",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0200",
+      "sentence": "这个价钱来说，还是可以了，比较干净，特别是被褥，很干净没有异味。",
+      "num_errors": 3,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "4 (mixed)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "2 (neutral)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0302",
+      "sentence": "房间设施差，房间里一股发霉的味道价格出奇的贵早餐比较差与对面的际豪酒店相比，完全没有竞争力不建议入住此酒店",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0237",
+      "sentence": "房间设施完全不是想象中的4星，充其量2星最多。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0166",
+      "sentence": "总之一句话，感觉比半年前住的时候糟糕很多，住的豪华商务单间，首先是酒店没收到携程的定单，在前台扯了半天，然后房间的墙壁有裂缝的，门锁是坏的（打到房务中心还没人管），床凳是脏的，去餐厅吃饭介绍的特色菜（如千张包）都是没有的，买单签个房帐要等20分钟的，唉怎么说的，真不知道怎么差别那么大！",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0456",
+      "sentence": "环境真的是闹中取静,隔壁是个蛮大的夜总会,不过除此之外,在15分钟步行范围内,没有什么商业设施,晚上走在路上觉得空旷渺无人烟,当然花花草草还是很多的,是有个湖,不过湖景么.",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "4 (mixed)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "1 (negative)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0004",
+      "sentence": "枕头太低了不好睡，不过在驻马店这种地方算可以了",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "4 (mixed)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0242",
+      "sentence": "几点遗憾：1、所谓的大床不是2x2的大床，带个小孩子肯定辛苦；2、中餐厅总是有宴会，动不动就包出去，只好到街上去吃饭。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "food",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0275",
+      "sentence": "498元的价格不是很厚道，但位置还是可以，预定时携程说酒店要信用卡担保，担保后到了酒店时，酒店说我预定的标准间没有了，免费个给我升级到套房。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "location",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0477",
+      "sentence": "3，房间很好，而且客房服务很到位。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0059",
+      "sentence": "出差途中无意中获得一张携程旅行网会员卡,通过网络订房及上网查询酒店的有关介绍,对其介绍的诸多荣誉很是好奇,入住期间所享受到的服务与大堂的荣誉榜甚是吻合,住宿、用餐、K歌及价位偶总体很满意。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "food",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "value",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0063",
+      "sentence": "很差，去到餐厅后发现什么也没有，当初在携程预定时所谓的双早根本没兑现，我们几位连早餐都没吃就结账走了，这个宾馆太需要改进了！",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0363",
+      "sentence": "如果你不接会一直打到晚上12点！！",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0318",
+      "sentence": "3、房间干净，客房服务员工作利索，效率也高。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        },
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0278",
+      "sentence": "服务总体很好，通过房间电话可以方便得到服务，价格有一定竞争力。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        },
+        {
+          "aspect": "food",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0140",
+      "sentence": "很难相信通过携程会订到这么污秽不堪的酒店,浴室的水龙头和花洒已生锈,房间地毯是黑色的。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0483",
+      "sentence": "房间的设施其实和豪华房是一样的，只不过因为3楼是夜总会，晚上有点吵，而且外面走廊的地毯有点脏。",
+      "num_errors": 2,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "2 (neutral)",
+          "predicted": "1 (negative)"
+        },
+        {
+          "aspect": "room_comfort",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0408",
+      "sentence": "由于天气预报的不确定性，预定过程中更改了几次时间，都顺利完成。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "service",
+          "expected": "3 (positive)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0181",
+      "sentence": "环境很好，服务周到，反应迅速，值得称赞。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "location",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0306",
+      "sentence": "酒店比较旧，听说有十几年的历史，房间也比较小。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0198",
+      "sentence": "酒店相当不错，离要去的白云山英语培训基地非常近。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0199",
+      "sentence": "非常不好的经历,通过携程定的房间,到了以后,服务的人员居然要我的身份证,我在美国生活了10年,早就没有了身份证,还好护照也勉强接受了,整个服",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0096",
+      "sentence": "订的市景双床房，免费升级到豪华双床房，感觉很好。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0022",
+      "sentence": "入住宾馆很失望,环境比较差,房间像招待所,正个房间充满着一股下水道的味道.",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0321",
+      "sentence": "该洒店设施不全且不洁净,让客户感觉不太敢放心使用,且服务人员态度不是太好,早上入住客人收拾房间的速度太慢",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "sound_insulation_noise",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0346",
+      "sentence": "路边有点吵，而且房子结构很不合理，窗户很小而且居然贴近地板.",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "cleanliness",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0220",
+      "sentence": "帮家人订的,没什么好说的,香港的酒店嘛,有这样的性价比就可以了.",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "3 (positive)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0144",
+      "sentence": "后来打电话询问被告知要45天。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0439",
+      "sentence": "唯一称赞的是地理位置，附近吃的喝的倒是有很多。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "0 (absent)",
+          "predicted": "3 (positive)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0163",
+      "sentence": "酒店的服务不太好，而且酒店的卫生条件令人担心。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "0 (absent)",
+          "predicted": "1 (negative)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0044",
+      "sentence": "美眉漂亮不说，很温柔体贴，这都是上层的管理和制度的导向，我认为海悦确实是以人为本，全心全意的为客户着想，比起那些所谓的5星级不知道好多少倍！",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "3 (positive)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0354",
+      "sentence": "总算可以免费上网了～经过3年的营运，价格在不断攀升，硬件多少在退化，服务还是一如既往。",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "value",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    },
+    {
+      "sentence_id": "HTL_S0223",
+      "sentence": "在线预订大床房，携程网介绍过于简单，由于18：00后到达，信用卡担保，结果到达在发现是阁楼房，简直.",
+      "num_errors": 1,
+      "mismatches": [
+        {
+          "aspect": "facilities",
+          "expected": "1 (negative)",
+          "predicted": "0 (absent)"
+        }
+      ]
+    }
+  ]
+}

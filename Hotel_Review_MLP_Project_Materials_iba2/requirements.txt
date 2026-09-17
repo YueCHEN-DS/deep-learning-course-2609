@@ -1,0 +1,12 @@
+# Core scientific & deep learning libraries
+numpy>=1.26.0
+torch>=2.0.0
+matplotlib>=3.7.0
+
+# Web deployment & REST API
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+
+# Embeddings & LLM Assisted Annotation (Qwen / DeepSeek)
+openai>=1.0.0

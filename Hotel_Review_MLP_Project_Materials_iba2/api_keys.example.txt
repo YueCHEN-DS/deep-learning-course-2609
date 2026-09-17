@@ -1,0 +1,8 @@
+# Hotel Review Sentiment Analysis API Keys Template
+# Rename or copy this file to 'api_keys.txt' and fill in your keys:
+#
+# Qwen DashScope Text Embedding API Key (for 256-dim embedding generation)
+embedding api key : sk-your-dashscope-embedding-api-key-here
+
+# DeepSeek Chat API Key (for AI-assisted labeling/annotation)
+deepseek api key: sk-your-deepseek-api-key-here

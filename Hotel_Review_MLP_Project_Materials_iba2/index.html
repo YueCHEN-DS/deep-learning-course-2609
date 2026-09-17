@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Review MLP Sentiment Analyzer | 酒店评论多维度情感分析系统</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.2">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Bar -->
+  <header class="app-header" id="appHeader">
+    <div class="header-left">
+      <div class="brand-logo">
+        <span class="logo-icon">🏨</span>
+        <div class="brand-text">
+          <span class="brand-title">Hotel Review Analyzer</span>
+          <span class="brand-subtitle">PyTorch Multi-Task MLP • 8 Aspects × 5 States</span>
+        </div>
+      </div>
+      <div class="badge-gen" id="badgeGen"><span class="gen-dot"></span> 第四代模型 Gen 4 (2000条全量Champion版)</div>
+      <div class="badge-arch" id="badgeArch">MLP: 256 → 256 → 128 → 40</div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" id="tabBtnReview" onclick="switchTab('review')">
+        <span class="tab-icon">📊</span> 评论全局分析
+      </button>
+      <button class="nav-tab" id="tabBtnManual" onclick="switchTab('manual')">
+        <span class="tab-icon">🔍</span> 单句人工检测
+      </button>
+      <button class="nav-tab" id="tabBtnModel" onclick="switchTab('model')">
+        <span class="tab-icon">🧠</span> 模型架构与基准
+      </button>
+      <button class="nav-tab" id="tabBtnDataset" onclick="switchTab('dataset')">
+        <span class="tab-icon">📁</span> 训练数据可视化与修正
+      </button>
+    </nav>
+
+    <!-- User Auth Status -->
+    <div class="header-right">
+      <div class="auth-status" id="authStatus">
+        <div class="user-avatar" id="userAvatar">👨‍🏫</div>
+        <div class="user-info">
+          <span class="user-name" id="displayUsername">teacher</span>
+          <span class="user-role" id="displayUserRole">Instructor / Auditor</span>
+        </div>
+        <button class="btn-logout" id="btnLogout" onclick="handleLogout()" title="Log out">
+          <span>退出登录</span>
+        </button>
+        <button class="btn-shutdown" id="btnShutdown" onclick="handleShutdown()" title="完全关闭后端服务，释放 CPU / 内存">
+          <span class="shutdown-dot"></span> 一键关闭服务
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Active Model Status Ribbon -->
+  <aside class="model-banner" id="modelBanner">
+    <div class="banner-inner">
+      <span class="banner-tag">🏆 MODEL GEN 4 CHAMPION</span>
+      <span class="banner-text">当前推断引擎：<strong id="bannerModelTitle">第四代全量Champion模型 (Model Gen 4)</strong> • 整体准确率 (Acc): <span class="highlight-val" id="bannerAcc">87.64%</span> • 方面提及 F1: <span class="highlight-val" id="bannerMentionF1">0.790</span> • 宏 F1 (Macro F1): <span class="highlight-val" id="bannerMacroF1">0.554</span></span>
+      <span class="banner-badge-gain" id="bannerGain">+37.64% 较初代显著飞跃 ↑</span>
+    </div>
+  </aside>
+
+  <!-- Main Container -->
+  <main class="main-container" id="mainContainer">
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: Review Sentiment Analyzer (Multi-Sentence Review)          -->
+    <!-- ================================================================= -->
+    <section class="tab-panel active" id="panelReview">
+      <div class="panel-grid">
+
+        <!-- Left Column: Input & Controls -->
+        <div class="panel-card input-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 class="card-title">输入待分析评论</h2>
+              <p class="card-desc">粘贴多句中文酒店评论，系统将自动分句并调用 256 维 Qwen 向量进行 MLP 逐句预测与聚合。</p>
+            </div>
+            <!-- Quick Demo Selectors -->
+            <div class="demo-picker-group">
+              <label for="demoSelect" class="picker-label">快速载入官方 Demo 评论 (30条):</label>
+              <select id="demoSelect" class="demo-select" onchange="loadSelectedDemo()">
+                <option value="">-- 选择示例评论 (DEMO 00~29) --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="textarea-wrapper">
+            <textarea
+              id="reviewInput"
+              class="review-textarea"
+              placeholder="例如：房间很干净，床也很舒服。但是晚上隔音不好。空调也不好用。前台态度很好，第二天服务员主动帮我换房。退房办理得很快。去地铁站很方便。"
+              rows="7"
+            ></textarea>
+            <div class="textarea-footer">
+              <span class="char-count" id="charCount">0 字符 • 0 预估分句</span>
+              <button class="btn-clear" onclick="clearReviewInput()">清空</button>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-primary" id="btnAnalyze" onclick="analyzeCurrentReview()">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-text">开始多维度情感分析</span>
+            </button>
+            <div class="sample-pills" id="samplePills">
+              <span class="pills-label">常用测试样句:</span>
+              <button class="pill-btn" onclick="insertSample(1)">典型好评 (DEMO_04)</button>
+              <button class="pill-btn" onclick="insertSample(2)">噪音与差评 (DEMO_01)</button>
+              <button class="pill-btn" onclick="insertSample(3)">多方面复合 (DEMO_06)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Review-Level Aggregation Score Chart (Slide 30, 32) -->
+        <div class="panel-card scores-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 class="card-title">评论级方面情感得分 (Review-Level Aggregation)</h2>
+              <p class="card-desc">计算公式: $S_a = 100 \times \frac{\sum s_{ia}}{n_a}$ (区间: -100 到 +100，未提及显示 Not mentioned)</p>
+            </div>
+            <span class="badge-status" id="analysisStatus">等待分析</span>
+          </div>
+
+          <!-- 8 Aspect Horizontal Bars Container -->
+          <div class="aspect-bars-grid" id="aspectBarsGrid">
+            <!-- Populated dynamically via app.js -->
+            <div class="empty-placeholder">
+              <span class="placeholder-icon">📋</span>
+              <p>在左侧输入或载入评论，点击“开始多维度情感分析”即可查看各方面得分柱状图</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Row: Detailed Sentence-by-Sentence Breakdown (Slide 31, 33) -->
+      <div class="panel-card sentence-breakdown-card" id="sentenceBreakdownCard" style="display: none;">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">逐句推断明细与证据 (Sentence-by-Sentence Breakdown)</h2>
+            <p class="card-desc" id="breakdownSubtitle">点击上方任意方面柱状图可筛选高亮对应的证据句子。</p>
+          </div>
+          <div class="filter-controls">
+            <button class="btn-filter active" id="filterAll" onclick="filterSentenceAspect('all')">全部句子</button>
+            <span class="filter-tip" id="filterActiveTip"></span>
+          </div>
+        </div>
+
+        <div class="sentence-list" id="sentenceList">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: Manual Detection & Audit Studio (Single Sentence Inspector)-->
+    <!-- ================================================================= -->
+    <section class="tab-panel" id="panelManual">
+      <div class="panel-grid single-col">
+        <div class="panel-card manual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 class="card-title">单句实时人工检测与探针 (Manual Detection & Probabilities)</h2>
+              <p class="card-desc">输入单句文本，实时探测 8 个方面在 5 种状态下的置信度分布与 logits 输出，便于人工核对模型推断行为。</p>
+            </div>
+          </div>
+
+          <div class="manual-input-box">
+            <input
+              type="text"
+              id="manualSentenceInput"
+              class="manual-input"
+              placeholder="输入单句测试（例如：前台态度不好，办理太慢。）"
+              value="前台态度不好，办理太慢。"
+            />
+            <button class="btn-primary" id="btnManualDetect" onclick="detectSingleSentence()">
+              <span>执行单句检测</span>
+            </button>
+          </div>
+
+          <!-- Quick test sentence chips -->
+          <div class="test-chips-row">
+            <span class="chips-label">典型边界测试例句 (Slide 8/19):</span>
+            <button class="chip-btn" onclick="setManualText('空调太吵，整晚睡不好。')">空调太吵 (隔音噪音=1)</button>
+            <button class="chip-btn" onclick="setManualText('空调坏了，吹不出热风。')">空调坏了 (设施=1)</button>
+            <button class="chip-btn" onclick="setManualText('前台热情，但办理太慢。')">前台热情但太慢 (服务=4 混合)</button>
+            <button class="chip-btn" onclick="setManualText('早餐一般，没有什么热菜。')">早餐一般 (餐饮=2 中性)</button>
+            <button class="chip-btn" onclick="setManualText('以后不会再住了。')">泛泛差评 (全部Absent)</button>
+            <button class="chip-btn" onclick="setManualText('提供免费机场接送，随到随发挺方便。')">机场接送 (位置=3 正面)</button>
+          </div>
+
+          <!-- Manual Detection Output: 8 Aspect Probability Cards -->
+          <div class="manual-aspects-grid" id="manualAspectsGrid">
+            <!-- Populated dynamically via app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: Model Architecture & Benchmark Performance (Slide 24-27)    -->
+    <!-- ================================================================= -->
+    <section class="tab-panel" id="panelModel">
+      <div class="panel-grid model-grid">
+        
+        <!-- Architecture Card -->
+        <div class="panel-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 class="card-title">MLP 模型架构 (Slide 24 & 25)</h2>
+              <p class="card-desc">严格遵循课件的 8 分类头多任务架构，使用独立 Softmax 预测 5 状态。</p>
+            </div>
+          </div>
+
+          <div class="arch-diagram">
+            <div class="arch-step">
+              <span class="arch-num">256</span>
+              <span class="arch-label">Qwen Embedding</span>
+              <span class="arch-sub">输入向量</span>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-step">
+              <span class="arch-num">256</span>
+              <span class="arch-label">Hidden Layer 0</span>
+              <span class="arch-sub">Linear + ReLU + Dropout</span>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-step">
+              <span class="arch-num">128</span>
+              <span class="arch-label">Hidden Layer 1</span>
+              <span class="arch-sub">Linear + ReLU + Dropout</span>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-step highlight">
+              <span class="arch-num">40</span>
+              <span class="arch-label">Output Logits</span>
+              <span class="arch-sub">Reshape (8 × 5)</span>
+            </div>
+          </div>
+
+          <div class="model-meta-list" id="modelMetaList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Evaluation Metrics Card -->
+        <div class="panel-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h2 class="card-title">测试集评测报告 (Slide 27 Held-out Benchmark)</h2>
+              <p class="card-desc">在严格隔离的独立测试集上的客观评测指标（由 audit_labels 审核后训练生成）。</p>
+            </div>
+          </div>
+
+          <div class="metrics-dashboard" id="metricsDashboard">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gen 1 vs Gen 2 Benchmark Evolution Card -->
+      <div class="panel-card full-width-card" id="genComparisonCard">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">四代模型演进基准对比 (Gen 1–4 Benchmark Comparison)</h2>
+            <p class="card-desc">对比 Gen1(100) / Gen2(500) / Gen3(1000) / Gen4(2000全量) 在独立 Held-Out 测试集上的演进提升。</p>
+          </div>
+        </div>
+        <div class="benchmark-table-wrap" id="genComparisonTableWrap">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+
+      <!-- 8-Aspect Acc & F1 Breakdown Card -->
+      <div class="panel-card full-width-card" id="aspectBenchmarkCard">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">8 大业务方面逐项表现 (Per-Aspect Accuracy & Mention F1 Breakdown)</h2>
+            <p class="card-desc">按课件要求的固定顺序（卫生、服务、位置、设施、舒适度、隔音、餐饮、性价比）展示各项准确率与提及 F1。</p>
+          </div>
+        </div>
+        <div class="benchmark-table-wrap" id="aspectBenchmarkTableWrap">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+
+      <!-- Training Curve Card -->
+      <div class="panel-card full-width-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">训练损失与验证指标收敛曲线 (Slide 26 & 27)</h2>
+            <p class="card-desc">自动监控 CrossEntropy 损失下降趋势，以及早停策略防止过拟合的记录。</p>
+          </div>
+        </div>
+        <div class="curve-image-box">
+          <img id="modelLossCurveImg" src="/experiments/run_model2_optimized_500data/loss_curves.png" alt="Training Loss Curves" class="curve-img" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: Training Dataset Visualizer & Correction Studio (NEW)       -->
+    <!-- ================================================================= -->
+    <section class="tab-panel" id="panelDataset">
+      <!-- 1. Dataset Overview KPI Ribbon -->
+      <div class="dataset-stats-ribbon">
+        <div class="ds-stat-card">
+          <div class="ds-stat-icon">📚</div>
+          <div class="ds-stat-info">
+            <span class="ds-stat-label">总训练集句子</span>
+            <span class="ds-stat-value" id="dsTotalSentences">2,000</span>
+            <span class="ds-stat-sub">全量中文酒店语料</span>
+          </div>
+        </div>
+        <div class="ds-stat-card success">
+          <div class="ds-stat-icon">✅</div>
+          <div class="ds-stat-info">
+            <span class="ds-stat-label">高质可训练样本</span>
+            <span class="ds-stat-value" id="dsTrainableCount">--</span>
+            <span class="ds-stat-sub">人工审核与规则确认</span>
+          </div>
+        </div>
+        <div class="ds-stat-card muted">
+          <div class="ds-stat-icon">🚫</div>
+          <div class="ds-stat-info">
+            <span class="ds-stat-label">排除噪音与回复</span>
+            <span class="ds-stat-value" id="dsExcludedCount">--</span>
+            <span class="ds-stat-sub">OTA噪音 / 酒店模板回复</span>
+          </div>
+        </div>
+        <div class="ds-stat-card warning clickable" onclick="toggleDisagreeFilter()" title="点击一键筛选模型与标注有分歧的样本">
+          <div class="ds-stat-icon">⚡</div>
+          <div class="ds-stat-info">
+            <span class="ds-stat-label">模型与标注分歧</span>
+            <span class="ds-stat-value" id="dsDisagreementCount">--</span>
+            <span class="ds-stat-sub">点击直达主动学习优化</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 8 Aspect Mentions & Sentiment Breakdown Dashboard -->
+      <div class="panel-card full-width-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <h2 class="card-title">8 大业务方面分布与情感状态构成 (Aspect Distribution & Sentiment Composition)</h2>
+            <p class="card-desc">点击下方任意方面卡片可快速筛选表格；彩条展示该方面在负面(红)、中性(黄)、正面(绿)、混合(紫)各状态的构成比例。</p>
+          </div>
+          <div class="aspect-legend">
+            <span class="legend-item"><span class="legend-dot negative"></span>负面</span>
+            <span class="legend-item"><span class="legend-dot neutral"></span>中性</span>
+            <span class="legend-item"><span class="legend-dot positive"></span>正面</span>
+            <span class="legend-item"><span class="legend-dot mixed"></span>混合</span>
+          </div>
+        </div>
+        <div class="aspect-dist-grid" id="aspectDistGrid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+
+      <!-- 3. Training Data Explorer & Studio Table -->
+      <div class="panel-card full-width-card">
+        <div class="card-header ds-toolbar-header">
+          <div class="card-title-group">
+            <h2 class="card-title">训练集明细检索与人工核查工坊 (Dataset Explorer & Correction Studio)</h2>
+            <p class="card-desc">浏览 2,000 条句子原文与 8 方面标签，对比模型实时推断，直接修改错误标注以重训优化模型。</p>
+          </div>
+          <div class="ds-action-buttons">
+            <button class="btn-retrain" id="btnOpenRetrain" onclick="openRetrainModal()">
+              <span class="btn-icon">🚀</span>
+              <span>基于新标注重训模型</span>
+            </button>
+            <button class="btn-export" onclick="exportDatasetFile()">
+              <span class="btn-icon">📥</span>
+              <span>导出 JSONL 标注集</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="ds-filter-bar">
+          <div class="ds-search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              type="text"
+              id="dsSearchInput"
+              class="ds-search-input"
+              placeholder="搜索句子文本 / 句子ID (如 HTL_S0010) / 评论ID..."
+              oninput="debounceSearch()"
+            />
+            <button class="btn-clear-search" onclick="clearDatasetSearch()" title="清空搜索">✕</button>
+          </div>
+
+          <div class="ds-filter-group">
+            <select id="dsAspectSelect" class="ds-select" onchange="onDatasetFilterChange()">
+              <option value="">全部 8 大方面</option>
+              <option value="cleanliness">✨ 卫生清洁 (Cleanliness)</option>
+              <option value="service">🤝 前台服务 (Service)</option>
+              <option value="location">📍 地理位置 (Location)</option>
+              <option value="facilities">🛠️ 硬件设施 (Facilities)</option>
+              <option value="room_comfort">🛏️ 房间舒适度 (Room Comfort)</option>
+              <option value="sound_insulation_noise">🔇 隔音与噪音 (Sound/Noise)</option>
+              <option value="food">🍽️ 餐饮质量 (Food)</option>
+              <option value="value">💰 价格性价比 (Value)</option>
+            </select>
+
+            <select id="dsStateSelect" class="ds-select" onchange="onDatasetFilterChange()">
+              <option value="">全部情感状态</option>
+              <option value="3">正面 (+1)</option>
+              <option value="1">负面 (-1)</option>
+              <option value="2">中性 (0)</option>
+              <option value="4">混合 (0)</option>
+              <option value="0">未提及 (Absent)</option>
+            </select>
+
+            <select id="dsStatusSelect" class="ds-select" onchange="onDatasetFilterChange()">
+              <option value="all">全部训练状态</option>
+              <option value="trainable">仅可训练样本 (Trainable)</option>
+              <option value="excluded">仅已排除样本 (Excluded)</option>
+              <option value="needs_review">仅待复核样本 (Needs Review)</option>
+            </select>
+
+            <button class="btn-toggle-filter" id="btnToggleDisagree" onclick="toggleDisagreeFilter()">
+              <span class="toggle-icon">⚠️</span>
+              <span>仅看预测分歧</span>
+            </button>
+
+            <button class="btn-reset-filters" onclick="resetDatasetFilters()" title="重置全部筛选条件">
+              <span>重置筛选</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Training Data Table -->
+        <div class="ds-table-wrapper">
+          <table class="ds-table" id="dsTable">
+            <thead>
+              <tr>
+                <th style="width: 100px;">句子 ID</th>
+                <th style="width: 110px;">来源评论 ID</th>
+                <th>句子原文 (点击查看上下文与核对)</th>
+                <th style="width: 110px;">训练状态</th>
+                <th style="width: 250px;">当前标注方面与情感</th>
+                <th style="width: 140px;">模型推断对比</th>
+                <th style="width: 100px; text-align: center;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="dsTableBody">
+              <!-- Populated dynamically via app.js -->
+            </tbody>
+          </table>
+          <div class="ds-loading-overlay" id="dsLoadingOverlay" style="display: none;">
+            <div class="spinner"></div>
+            <span>正在加载训练数据...</span>
+          </div>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div class="ds-pagination-bar">
+          <div class="pagination-info" id="dsPaginationInfo">
+            共 0 条数据 • 第 1 / 1 页
+          </div>
+          <div class="pagination-controls">
+            <label class="page-size-label">
+              每页显示:
+              <select id="dsPageSizeSelect" class="page-size-select" onchange="onPageSizeChange()">
+                <option value="10">10 条</option>
+                <option value="20" selected>20 条</option>
+                <option value="50">50 条</option>
+              </select>
+            </label>
+            <button class="btn-page" id="btnPrevPage" onclick="changeDatasetPage(-1)" disabled>上一页</button>
+            <span class="page-current" id="dsCurrentPageDisplay">1</span>
+            <button class="btn-page" id="btnNextPage" onclick="changeDatasetPage(1)" disabled>下一页</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: Training Sample Inspection & Annotation Studio (#editModal)-->
+  <!-- ================================================================= -->
+  <div class="modal-overlay" id="editModal" style="display: none;">
+    <div class="modal-card edit-modal-card">
+      <div class="modal-header edit-modal-header">
+        <div class="edit-modal-title-group">
+          <div class="title-row">
+            <span class="modal-icon">✏️</span>
+            <h3 class="modal-title" id="editModalTitle">样本标注与修改工作台</h3>
+            <span class="badge-sid" id="editSentenceId">HTL_S0000</span>
+            <span class="badge-rid" id="editReviewId">HTL_R05566</span>
+          </div>
+          <p class="modal-subtitle">课件标准标注体系：独立标注 8 个业务方面的情感状态，并可一键采纳模型推断或人工纠偏以重训提高模型精度。</p>
+        </div>
+        <button class="btn-close-modal" onclick="closeEditModal()" title="关闭">✕</button>
+      </div>
+
+      <div class="modal-body edit-modal-body">
+        <!-- Context & Target Sentence Box -->
+        <div class="sentence-context-card">
+          <div class="context-row" id="editContextBeforeRow">
+            <span class="context-tag">前句语境</span>
+            <p class="context-text" id="editContextBefore">（无前句）</p>
+          </div>
+          <div class="target-sentence-row">
+            <span class="context-tag target">目标原句</span>
+            <p class="target-sentence-text" id="editTargetSentence"></p>
+          </div>
+          <div class="context-row" id="editContextAfterRow">
+            <span class="context-tag">后句语境</span>
+            <p class="context-text" id="editContextAfter">（无后句）</p>
+          </div>
+        </div>
+
+        <!-- Model vs Current Label Comparison Banner -->
+        <div class="comparison-summary-banner" id="comparisonBanner">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- 8 Aspects Interactive Grid -->
+        <div class="aspect-editors-section">
+          <div class="section-title-row">
+            <h4 class="section-title">8 大业务方面情感标注与证据核对 (Aspect Annotations)</h4>
+            <div class="quick-assist-actions">
+              <button class="btn-assist" onclick="adoptModelPrediction()" title="直接采用当前 MLP 模型的推断结果作为标注">
+                <span>⚡ 一键采纳模型预测</span>
+              </button>
+              <button class="btn-assist" onclick="clearAllAspectsToAbsent()" title="将所有 8 个方面全部置为未提及">
+                <span>🔄 设为全部未提及</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="aspect-editors-grid" id="aspectEditorsGrid">
+            <!-- 8 aspect editor cards injected via app.js -->
+          </div>
+        </div>
+
+        <!-- Audit & Exclusion Controls -->
+        <div class="audit-controls-card">
+          <div class="control-col">
+            <label class="toggle-control">
+              <input type="checkbox" id="editExcludeToggle" onchange="onExcludeToggleChange()" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">排除此句（不参与 MLP 模型训练）</span>
+            </label>
+            <span class="control-tip">勾选后该句子将被剔除出训练与测试集（适用于纯OTA噪音、酒店客套回复、无实体评价）。</span>
+          </div>
+
+          <div class="control-col">
+            <label class="toggle-control">
+              <input type="checkbox" id="editNeedsReviewToggle" />
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">标记为待复核 (Needs Review)</span>
+            </label>
+            <span class="control-tip">若对情感边界有疑虑可勾选标记，后续集中抽检。</span>
+          </div>
+
+          <div class="control-col full-width">
+            <label for="editNotesInput" class="input-label">标注备注与审计说明 (Notes & Audit Basis):</label>
+            <input type="text" id="editNotesInput" class="form-input" placeholder="例如：空调噪音归为隔音，床硬归为舒适度..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer edit-modal-footer">
+        <span class="footer-status-text" id="editSaveStatus"></span>
+        <div class="footer-btns">
+          <button class="btn-cancel" onclick="closeEditModal()">取消</button>
+          <button class="btn-primary" id="btnSaveAnnotation" onclick="saveAnnotationEdits()">
+            <span class="btn-icon">💾</span>
+            <span>保存修改并更新数据集</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: Interactive Model Retraining Studio (#retrainModal)       -->
+  <!-- ================================================================= -->
+  <div class="modal-overlay" id="retrainModal" style="display: none;">
+    <div class="modal-card retrain-modal-card">
+      <div class="modal-header">
+        <span class="modal-icon">🚀</span>
+        <h3 class="modal-title">基于最新标注重训 MLP 模型 (Interactive Retrain)</h3>
+        <button class="btn-close-modal" onclick="closeRetrainModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="retrain-intro">
+          您对训练集标签的修改已保存。点击“开始重训”将自动调用 PyTorch 重新训练多任务 MLP 模型，并在严格隔离的独立 Held-out 测试集上评估精度提升。
+        </p>
+
+        <div class="retrain-config-card">
+          <h4 class="config-title">训练参数配置 (Gen 4 Champion Architecture)</h4>
+          <div class="config-grid">
+            <div class="config-item">
+              <span class="config-label">隐层架构:</span>
+              <span class="config-val">256 → 384 → 192 → 40</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">最大轮数 (Epochs):</span>
+              <span class="config-val">40 (带早停 Early Stopping)</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">批大小 (Batch Size):</span>
+              <span class="config-val">16 (含 BatchNorm1d)</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">学习率与衰减:</span>
+              <span class="config-val">lr=0.001, ReduceLROnPlateau</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">损失函数权重:</span>
+              <span class="config-val">Balanced CE (Class 0 Cap 0.25)</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">预估耗时:</span>
+              <span class="config-val highlight">~4 - 6 秒 (使用预存 256维向量)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Training Progress & Status Area -->
+        <div class="retrain-progress-area" id="retrainProgressArea" style="display: none;">
+          <div class="spinner large"></div>
+          <div class="progress-details">
+            <span class="progress-main-text" id="retrainProgressText">正在准备数据并启动 PyTorch 训练引擎...</span>
+            <span class="progress-sub-text" id="retrainProgressSub">执行 GroupKFold 分割，计算交叉熵损失，评估测试集...</span>
+          </div>
+        </div>
+
+        <!-- Retrain Results Comparison Card -->
+        <div class="retrain-result-card" id="retrainResultCard" style="display: none;">
+          <div class="result-header">
+            <span class="result-badge">🎉 重训完成，新模型权重已热更新并实时生效！</span>
+            <span class="result-time" id="retrainDuration">耗时 4.2 秒</span>
+          </div>
+          <table class="retrain-comparison-table">
+            <thead>
+              <tr>
+                <th>评测指标</th>
+                <th>重训前 (Old)</th>
+                <th>重训后 (New)</th>
+                <th>变化幅度 (Delta)</th>
+              </tr>
+            </thead>
+            <tbody id="retrainComparisonTbody">
+              <!-- Injected via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancelRetrain" onclick="closeRetrainModal()">关闭</button>
+        <button class="btn-primary" id="btnExecuteRetrain" onclick="executeRetraining()">
+          <span class="btn-icon">⚡</span>
+          <span>立即开始重训</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Login Modal (Slide 29 Requirement) -->
+  <div class="modal-overlay" id="loginModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-icon">🔐</span>
+        <h3 class="modal-title">用户登录 (Sign In)</h3>
+        <p class="modal-subtitle">课件要求：提供可供教师审核与测试的登录与登出功能。</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="inputUsername">用户名 (Username)</label>
+          <input type="text" id="inputUsername" class="form-input" value="teacher" placeholder="teacher / student01">
+        </div>
+        <div class="form-group">
+          <label for="inputPassword">密码 (Password)</label>
+          <input type="password" id="inputPassword" class="form-input" value="admin123" placeholder="admin123 / 123456">
+        </div>
+
+        <div class="preset-accounts">
+          <span class="preset-title">教师与测试快捷账号:</span>
+          <div class="preset-btns">
+            <button class="btn-preset" onclick="fillAccount('teacher', 'admin123')">👨‍🏫 教师测试账号 (teacher)</button>
+            <button class="btn-preset" onclick="fillAccount('student01', '123456')">🎓 学生开发账号 (student01)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary full-width" onclick="submitLogin()">确认登录</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p>Deep Learning Course Project • International Joint Audit Institute • Wei Ou</p>
+    <p class="footer-sub">Hotel Review Sentiment Analyzer • Powered by PyTorch & Qwen Embeddings</p>
+  </footer>
+
+  <script src="app.js?v=2.2"></script>
+</body>
+</html>

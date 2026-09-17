@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+*.py[cod]
 
 # Dataset (downloaded automatically on train)
 data/
@@ -9,3 +10,16 @@ data/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Secrets & API Keys
+api_keys.txt
+api_kyes.txt
+.env
+*.env.local
+
+# Temp, backups, archives
+*.backup.jsonl
+*.retrain_backup.jsonl
+mlp_weights.json
+*.zip
+
